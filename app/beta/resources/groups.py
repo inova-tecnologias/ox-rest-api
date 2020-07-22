@@ -13,10 +13,10 @@ class GroupList(BaseResource):
     @group_ns.marshal_with(GroupModel.resource_model)
     def get(self):
         """Get the list of groups"""
-        costumer_id = get_jwt_claims()['costumer_id']
+        customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
 
-        if costumer_id:
+        if customer_id:
             condition = GroupModel.ctx_id.in_(permited_contexts)
         else:
             condition = True
@@ -41,10 +41,10 @@ class GroupList(BaseResource):
 class Group(BaseResource):
     @group_ns.marshal_with(GroupModel.resource_model)
     def get(self, mbx_id):
-        costumer_id = get_jwt_claims()['costumer_id']
+        customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
 
-        if costumer_id:
+        if customer_id:
             condition = GroupModel.ctx_id.in_(permited_contexts)
         else:
             condition = True

@@ -11,7 +11,7 @@ class Context(db.Model):
     usedQuota = db.Column(db.Integer, default=0)
     enabled = db.Column(db.Boolean, default=True)
     #admin = db.Column(db.String(150), unique=True)
-    costumer_id = db.Column(db.Integer, db.ForeignKey('costumer.id'), nullable=False)    
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)    
 
     @property
     def ox_id(self):
@@ -26,7 +26,7 @@ class Context(db.Model):
     'name': fields.String(required=True),
     'password': fields.String(required=True),
     'maxQuota': fields.Integer(),
-    'costumer_id': fields.Integer()
+    'customer_id': fields.Integer()
     })
     
     resource_model = api.model('Context', {
@@ -36,7 +36,7 @@ class Context(db.Model):
     'maxQuota': fields.Integer(),
     'enabled': fields.Boolean(),
     'ox_id': fields.Integer(),
-    'costumer_id': fields.Integer(),
+    'customer_id': fields.Integer(),
 
     #'admin': fields.String(),
     })  

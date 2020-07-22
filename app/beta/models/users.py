@@ -16,7 +16,7 @@ class User(db.Model):
     name = db.Column(db.String(50))
     description = db.Column(db.String(200))
     
-    costumer_id = db.Column(db.Integer, db.ForeignKey('costumer.id'))    
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))    
     
     password_hash = db.Column(db.String(150), nullable=False)
 
@@ -36,7 +36,7 @@ class User(db.Model):
         'isAdmin': fields.Boolean(),
         'name': fields.String(),
         'description': fields.String(),
-        'costumer_id': fields.Integer()
+        'customer_id': fields.Integer()
 
 
     })
@@ -47,7 +47,7 @@ class User(db.Model):
     'isAdmin': fields.Boolean(default=False),
     'name': fields.String(),
     'description': fields.String(),
-    'costumer_id': fields.Integer()
+    'customer_id': fields.Integer()
 
     })
 

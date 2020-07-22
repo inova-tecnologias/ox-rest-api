@@ -31,8 +31,8 @@ class UserList(BaseResource):
             })
     def get(self):
         """Get the list of users"""
-        costumer_id = get_jwt_claims()['costumer_id']
-        validation = {'costumer_id': costumer_id} if costumer_id else {}    
+        customer_id = get_jwt_claims()['customer_id']
+        validation = {'customer_id': customer_id} if customer_id else {}    
         result = self.paginate(UserModel, validation=validation)
         return result.items, {'X-Total-Count': result.total}
 
@@ -72,10 +72,10 @@ class User(BaseResource):
     @user_ns.marshal_with(UserModel.resource_model)
     def get(self, user_id):
         """Get one User"""
-        cid = get_jwt_claims()['costumer_id']
+        cid = get_jwt_claims()['customer_id']
         query = {'id': user_id}
         if cid:
-            query.update({'costumer_id': cid})
+            query.update({'customer_id': cid})
 
         result = UserModel.query.filter_by(**query).first_or_404
 
@@ -87,10 +87,10 @@ class User(BaseResource):
     @user_ns.marshal_with(UserModel.resource_model)
     def delete(self, user_id):
         """Delete one User"""
-        cid = get_jwt_claims()['costumer_id']
+        cid = get_jwt_claims()['customer_id']
         query = {'id': user_id}
         if cid:
-            query.update({'costumer_id': cid})
+            query.update({'customer_id': cid})
 
         result = UserModel.query.filter_by(**query).first_or_404()
         db.session.delete(result)
@@ -103,10 +103,10 @@ class User(BaseResource):
     def put(self, user_id):
         """Edit User""" 
         data = api.payload
-        cid = get_jwt_claims()['costumer_id']
+        cid = get_jwt_claims()['customer_id']
         query = {'id': user_id}
         if cid:
-            query.update({'costumer_id': cid})
+            query.update({'customer_id': cid})
 
         result = UserModel.query.filter_by(**query)
         result.update(data)

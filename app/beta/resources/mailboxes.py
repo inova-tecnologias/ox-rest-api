@@ -18,10 +18,10 @@ class MbxList(BaseResource):
     @mbx_ns.marshal_with(MbxModel.resource_model)
     def get(self):
         """Get the list of Mailboxes"""
-        costumer_id = get_jwt_claims()['costumer_id']
+        customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
 
-        if costumer_id:
+        if customer_id:
             condition = MbxModel.ctx_id.in_(permited_contexts)
         else:
             condition = True
@@ -79,10 +79,10 @@ class Mbx(BaseResource):
     @mbx_ns.marshal_with(MbxModel.resource_model)
     def get(self, mbx_id):
         """Get one Mailbox"""
-        costumer_id = get_jwt_claims()['costumer_id']
+        customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
 
-        if costumer_id:
+        if customer_id:
             condition = MbxModel.ctx_id.in_(permited_contexts)
         else:
             condition = True
@@ -96,15 +96,19 @@ class Mbx(BaseResource):
     @mbx_ns.response(204, 'Mailbox deleted')
     def delete(self, mbx_id):
         """Delete Mailbox"""
-        costumer_id = get_jwt_claims()['costumer_id']
+        customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
 
-        if costumer_id:
+        if customer_id:
             condition = MbxModel.ctx_id.in_(permited_contexts)
         else:
             condition = True
         
         result = MbxModel.query.filter(condition).filter_by(id=mbx_id).first_or_404()
+        print(result)
+        print(result[0])
+        print(result[0].ctx_id)
+        print(result[0].ox_id)
         OXMbx.service.delete(
             auth=oxcreds,
             ctx={'id': result[0].ctx_id},
@@ -118,10 +122,10 @@ class Mbx(BaseResource):
         """Edit Mailbox"""
         data = api.payload
         data.pop('display_name', None) # TODO: remove display_name
-        costumer_id = get_jwt_claims()['costumer_id']
+        customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
 
-        if costumer_id:
+        if customer_id:
             condition = MbxModel.ctx_id.in_(permited_contexts)
         else:
             condition = True

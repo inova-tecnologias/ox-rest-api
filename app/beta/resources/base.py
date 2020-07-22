@@ -97,7 +97,7 @@ class BaseResource(Resource):
 
 
     def query_many(self, model):
-        costumer_id = get_jwt_claims()['costumer_id']
+        customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
         
         query = eval(self.parse_args('filter', '{}'))
@@ -120,9 +120,9 @@ class BaseResource(Resource):
         result = model.query
         
 
-        if costumer_id and model.resource_model.get('costumer_id'):
-            query = query.update({'costumer_id': costumer_id})
-        if costumer_id and model.resource_model.get('ctx_id'):
+        if customer_id and model.resource_model.get('customer_id'):
+            query = query.update({'customer_id': customer_id})
+        if customer_id and model.resource_model.get('ctx_id'):
             result = result.filter(model.ctx_id.in_(permited_contexts))
 
 

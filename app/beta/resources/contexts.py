@@ -20,8 +20,8 @@ class CtxList(BaseResource):
     @ctx_ns.marshal_with(CtxModel.resource_model)
     def get(self):
         """Get the list of Contexts"""
-        costumer_id = get_jwt_claims()['costumer_id']
-        validation = {'costumer_id': costumer_id} if costumer_id else {}    
+        customer_id = get_jwt_claims()['customer_id']
+        validation = {'customer_id': customer_id} if customer_id else {}    
         result = self.paginate(CtxModel, validation=validation)
         return result.items, {'X-Total-Count': result.total}
 
@@ -66,10 +66,10 @@ class Ctx(BaseResource):
     @ctx_ns.marshal_with(CtxModel.resource_model)
     def get(self, ctx_id):
         """Get one Context"""
-        cid = get_jwt_claims()['costumer_id']
+        cid = get_jwt_claims()['customer_id']
         query = {'id': ctx_id}
         if cid:
-            query.update({'costumer_id': cid})
+            query.update({'customer_id': cid})
 
         result = CtxModel.query.filter_by(**query).first_or_404
 
@@ -79,10 +79,10 @@ class Ctx(BaseResource):
     @ctx_ns.response(204, 'Context deleted')
     def delete(self, ctx_id):
         """Delete Context"""
-        cid = get_jwt_claims()['costumer_id']
+        cid = get_jwt_claims()['customer_id']
         query = {'id': ctx_id}
         if cid:
-            query.update({'costumer_id': cid})
+            query.update({'customer_id': cid})
 
         result = CtxModel.query.filter_by(**query).first_or_404()
         db.session.delete(result)
@@ -99,10 +99,10 @@ class Ctx(BaseResource):
         data.pop('groups', None) # TODO: update groups instead ignore
         data.pop('ox_id', None) # ox_id is alias for id
 
-        cid = get_jwt_claims()['costumer_id']
+        cid = get_jwt_claims()['customer_id']
         query = {'id': ctx_id}
         if cid:
-            query.update({'costumer_id': cid})
+            query.update({'customer_id': cid})
 
         result = CtxModel.query.filter_by(**query)
 

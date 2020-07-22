@@ -8,7 +8,7 @@ from flask_jwt_extended import (
 
 from app import db, jwt
 from .. import api
-from ..models.costumers import Costumer as CostumerModel
+from ..models.customers import Customer as CustomerModel
 from ..models.users import User as UserModel
 from ..models.auth import Token
 
@@ -27,7 +27,7 @@ def admin():
         'username',
         'password',
         'isAdmin',
-        'costumer_id'
+        'customer_id'
     ]:
         model.__delitem__(attr)
     
@@ -54,10 +54,10 @@ def check_if_token_in_blacklist(decrypted_token):
 def add_claims_to_access_token(identity):
     user = UserModel.query.filter_by(username=identity).first()
     
-    costumer_id = user.costumer_id
-    if costumer_id:
-        costumer = CostumerModel.query.filter_by(id=user.costumer_id).first()
-        contexts = [context.id for context in costumer.contexts]
+    customer_id = user.customer_id
+    if customer_id:
+        customer = CustomerModel.query.filter_by(id=user.customer_id).first()
+        contexts = [context.id for context in customer.contexts]
     else:
         contexts = []
         
@@ -66,7 +66,7 @@ def add_claims_to_access_token(identity):
         name = user.name,
         username = user.username,
         isAdmin = user.isAdmin,
-        costumer_id = costumer_id,
+        customer_id = customer_id,
         contexts = contexts
     )
     return claims
