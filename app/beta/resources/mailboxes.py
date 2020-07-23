@@ -105,14 +105,10 @@ class Mbx(BaseResource):
             condition = True
         
         result = MbxModel.query.filter(condition).filter_by(id=mbx_id).first_or_404()
-        print(result)
-        print(result[0])
-        print(result[0].ctx_id)
-        print(result[0].ox_id)
         OXMbx.service.delete(
             auth=oxcreds,
-            ctx={'id': result[0].ctx_id},
-            user={'id': result[0].ox_id}
+            ctx={'id': result.ctx_id},
+            user={'id': result.ox_id}
             )
         return result
 
