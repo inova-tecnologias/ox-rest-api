@@ -14,8 +14,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ENV=os.getenv('OXAPI_ENVIRONMENT', default='development')
     JWT_BLACKLIST_ENABLED = True
-    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
-    
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']    
 
 class DevelopmentConfig(Config):
     """
