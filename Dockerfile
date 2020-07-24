@@ -3,4 +3,4 @@ WORKDIR /opt/ox-admin/rest-api
 ADD . /opt/ox-admin/rest-api
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
-CMD ["python","oxapi.py", "runserver", "--host", "0.0.0.0"]
+CMD ["gunicorn", "--cerfile", "cert.pem", "--keyfile", "cert.key", "--bind", "0.0.0.0:5000", "oxapi:app"]
