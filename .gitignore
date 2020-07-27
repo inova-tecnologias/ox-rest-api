@@ -110,7 +110,6 @@ env.bak/
 venv.bak/
 bin
 lib64
-migrations
 share
 include
 
