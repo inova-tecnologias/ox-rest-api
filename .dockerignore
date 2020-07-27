@@ -1,0 +1,14 @@
+
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.git
+bin
+include
+lib
+lib64
+pyenv.cfg
+share
+migrations
