@@ -13,6 +13,13 @@ from ..soap.ox import (
 
 mbx_ns = Namespace('Mailboxes', path='/mailboxes')
 
+plans = {
+    1: {'name': 'INOVA OXMAIL BASIC 2GB', 'maxQuota': 2048, 'oxplan': 'webmail_plus'},
+    2: {'name': 'INOVA OXMAIL BASIC 5GB', 'maxQuota': 5120, 'oxplan': 'webmail_plus'},
+    3: {'name': 'INOVA OXMAIL ADVANCED 2GB', 'maxQuota': 2048, 'oxplan': 'groupware_premium' },
+    4: {'name': 'INOVA OXMAIL ADVANCED 5GB', 'maxQuota': 5120, 'oxplan': 'groupware_premium' },
+}
+
 @mbx_ns.route('')
 class MbxList(BaseResource):
     @mbx_ns.marshal_with(MbxModel.resource_model)
@@ -34,6 +41,8 @@ class MbxList(BaseResource):
     def post(self):
         """Insert a Mailbox"""
         data = api.payload
+        maxQuota = plans[api.payload['plan_id']]['maxQuota']
+        oxplan = plans[api.payload['plan_id']]['oxplan']
         aliases = data.pop('aliases', [])
         mailbox = {
             'name': data['email'],
@@ -48,7 +57,7 @@ class MbxList(BaseResource):
             'primaryEmail': data['email'],
             'email1': data['email'],
             'defaultSenderAddress': data['email'],
-            'language': 'en_US',
+            'language': 'pt_BR',
             'timezone': 'America/Sao_Paulo',
         }
 
@@ -56,17 +65,17 @@ class MbxList(BaseResource):
             auth=oxcreds,
             usrdata=mailbox,
             ctx={'id': data['ctx_id']},
-            access_combination_name='groupware_premium'
+            access_combination_name=oxplan
         )['id']
 
         OXaaS.service.setMailQuota(
             ctxid = data['ctx_id'],
             usrid = mbxid,
-            quota = data['maxQuota'],
+            quota = maxQuota,
             creds = oxcreds
         )
 
-        data.update({'ox_id': mbxid})
+        data.update({'ox_id': mbxid, 'maxQuota': maxQuota})
         instance = self.make_instance(MbxModel, data)
         db.session.add(instance)
         db.session.commit()

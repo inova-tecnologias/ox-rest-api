@@ -13,6 +13,7 @@ class Mailbox(db.Model):
     _password = db.Column(db.String(30))
     maxQuota = db.Column(db.Integer, default=50)
     usedQuota = db.Column(db.Integer, default=0)
+    plan_id = db.Column(db.Integer, nullable=False)
     enabled = db.Column(db.Boolean, default=True)
     groups = db.relationship("Group", secondary=association_table)
     ox_id = db.Column(db.Integer, nullable=False)
@@ -36,7 +37,7 @@ class Mailbox(db.Model):
     register_model = api.model('Register Mailbox', {
     'password': fields.String(required=True),
     'email': fields.String(required=True),
-    'maxQuota': fields.Integer(default=50),
+    'plan_id': fields.Integer(required=True),
     'given_name': fields.String(required=True),
     'last_name': fields.String(required=True),
     'ctx_id': fields.Integer(required=True)
@@ -48,6 +49,7 @@ class Mailbox(db.Model):
     'given_name': fields.String(),
     'last_name': fields.String(),
     'email': fields.String(),
+    'plan_id': fields.Integer(),
     'usedQuota': fields.Integer(),
     'maxQuota': fields.Integer(),
     'enabled': fields.Boolean(),
