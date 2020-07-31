@@ -14,10 +14,10 @@ from ..soap.ox import (
 mbx_ns = Namespace('Mailboxes', path='/mailboxes')
 
 plans = {
-    1: {'name': 'INOVA OXMAIL BASIC 2GB', 'maxQuota': 2048, 'oxplan': 'webmail_plus'},
-    2: {'name': 'INOVA OXMAIL BASIC 5GB', 'maxQuota': 5120, 'oxplan': 'webmail_plus'},
-    3: {'name': 'INOVA OXMAIL ADVANCED 2GB', 'maxQuota': 2048, 'oxplan': 'groupware_premium' },
-    4: {'name': 'INOVA OXMAIL ADVANCED 5GB', 'maxQuota': 5120, 'oxplan': 'groupware_premium' },
+    1: {'name': 'INOVA OXMAIL BASIC 2GB', 'maxQuota': 2048, 'oxplan': 'cloud_pim'},
+    2: {'name': 'INOVA OXMAIL BASIC 5GB', 'maxQuota': 5120, 'oxplan': 'cloud_productivity'},
+    3: {'name': 'INOVA OXMAIL ADVANCED 2GB', 'maxQuota': 2048, 'oxplan': 'cloud_pim' },
+    4: {'name': 'INOVA OXMAIL ADVANCED 5GB', 'maxQuota': 5120, 'oxplan': 'cloud_productivity' },
 }
 
 @mbx_ns.route('')
@@ -118,8 +118,7 @@ class Mbx(BaseResource):
             auth=oxcreds,
             ctx={'id': result.ctx_id},
             user={'id': result.ox_id}
-            )
-        
+            )        
         db.session.delete(result)
         db.session.commit()
         return result
