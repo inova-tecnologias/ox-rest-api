@@ -119,6 +119,9 @@ class Mbx(BaseResource):
             ctx={'id': result.ctx_id},
             user={'id': result.ox_id}
             )
+        
+        db.session.delete(result)
+        db.session.commit()
         return result
 
     @mbx_ns.expect(MbxModel.register_model)  
