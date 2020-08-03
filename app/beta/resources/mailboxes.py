@@ -15,8 +15,8 @@ mbx_ns = Namespace('Mailboxes', path='/mailboxes')
 
 plans = {
     1: {'name': 'INOVA OXMAIL BASIC 2GB', 'maxQuota': 2048, 'oxplan': 'cloud_pim'},
-    2: {'name': 'INOVA OXMAIL BASIC 5GB', 'maxQuota': 5120, 'oxplan': 'cloud_productivity'},
-    3: {'name': 'INOVA OXMAIL ADVANCED 2GB', 'maxQuota': 2048, 'oxplan': 'cloud_pim'},
+    2: {'name': 'INOVA OXMAIL BASIC 5GB', 'maxQuota': 5120, 'oxplan': 'cloud_pim'},
+    3: {'name': 'INOVA OXMAIL ADVANCED 2GB', 'maxQuota': 2048, 'oxplan': 'cloud_productivity'},
     4: {'name': 'INOVA OXMAIL ADVANCED 5GB', 'maxQuota': 5120, 'oxplan': 'cloud_productivity'},
     5: {'name': 'INOVA OXMAIL ADVANCED 10GB', 'maxQuota': 10240, 'oxplan': 'cloud_productivity'},
 }
