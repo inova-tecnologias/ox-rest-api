@@ -16,6 +16,7 @@ class PlanList(BaseResource):
     @plan_ns.marshal_with(PlanModel.resource_model)
     def get(self):
         """Get the list of Plans"""
+        result = self.paginate(PlanModel)
         return result.items, {'X-Total-Count': result.total}
 
 
@@ -37,6 +38,7 @@ class Plan(BaseResource):
     def get(self, ctx_id):
         """Get one Plan"""
         result = PlanModel.query.filter_by().first_or_404
+        return result, 200
 
 
     @plan_ns.marshal_with(PlanModel.resource_model)

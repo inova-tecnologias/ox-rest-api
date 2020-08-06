@@ -23,6 +23,7 @@ class Plan(db.Model):
     resource_model = api.model('Plan', {
     'id': fields.Integer(),
     'name': fields.String(),
+    'oxid': fields.String(),
     'quota': fields.Integer(),
     'description': fields.String(),
     })  
