@@ -2,7 +2,7 @@ from flask_restplus import Resource, Namespace, fields
 from flask_jwt_extended import get_jwt_claims
 
 from app import db
-
+from app.util import random_password
 from .base import BaseResource
 from .. import api
 from ..models.contexts import Context as CtxModel
@@ -33,7 +33,7 @@ class CtxList(BaseResource):
         data = api.payload
 
         name = data['name']
-        password = data['password']
+        password = random_password()
         sur_name = "Context Admin"
 
         ctxname = (oxaasadmctx, name)
@@ -41,7 +41,7 @@ class CtxList(BaseResource):
         
         admin_user = {
             'name': "oxadmin+%s_%s" %ctxname,
-            'password': data['password'],
+            'password': password,
             'display_name': "%s %s" %(name, sur_name),
             'given_name': name,
             'sur_name': sur_name,
@@ -49,7 +49,7 @@ class CtxList(BaseResource):
             'email1': mail
         }
         ctx = {
-            'maxQuota': data['maxQuota'],
+            'maxQuota': 500,
             'name': "%s_%s" %ctxname
         } 
         ctxid = OXCtx.service.create(auth=oxcreds, ctx=ctx, admin_user=admin_user)['id']
