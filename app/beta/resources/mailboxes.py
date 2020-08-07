@@ -4,6 +4,7 @@ from app import db
 from .base import BaseResource
 from .. import api
 from ..models.mailboxes import Mailbox as MbxModel
+from ..models.plans import Plan as PlanModel
 from ..soap.ox import (
     oxaasadmctx, 
     credentials as oxcreds,
@@ -12,14 +13,6 @@ from ..soap.ox import (
 )
 
 mbx_ns = Namespace('Mailboxes', path='/mailboxes')
-
-plans = {
-    1: {'name': 'INOVA OXMAIL BASIC 2GB', 'maxQuota': 2048, 'oxplan': 'cloud_pim'},
-    2: {'name': 'INOVA OXMAIL BASIC 5GB', 'maxQuota': 5120, 'oxplan': 'cloud_pim'},
-    3: {'name': 'INOVA OXMAIL ADVANCED 2GB', 'maxQuota': 2048, 'oxplan': 'cloud_productivity'},
-    4: {'name': 'INOVA OXMAIL ADVANCED 5GB', 'maxQuota': 5120, 'oxplan': 'cloud_productivity'},
-    5: {'name': 'INOVA OXMAIL ADVANCED 10GB', 'maxQuota': 10240, 'oxplan': 'cloud_productivity'},
-}
 
 @mbx_ns.route('')
 class MbxList(BaseResource):
@@ -42,8 +35,9 @@ class MbxList(BaseResource):
     def post(self):
         """Insert a Mailbox"""
         data = api.payload
-        maxQuota = plans[api.payload['plan_id']]['maxQuota']
-        oxplan = plans[api.payload['plan_id']]['oxplan']
+        plan = PlanModel.query.filter_by(id=api.payload['plan_id']).first_or_404()
+        maxQuota = plan.quota * 1024
+        oxplan =  plan.oxid
         aliases = data.pop('aliases', [])
         mailbox = {
             'name': data['email'],

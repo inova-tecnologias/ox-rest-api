@@ -31,13 +31,13 @@ class PlanList(BaseResource):
         return instance, 201
 
 
-@plan_ns.route('/<ctx_id>')
+@plan_ns.route('/<plan_id>')
 class Plan(BaseResource):
     @plan_ns.response(404, 'Plan Not Found')
     @plan_ns.marshal_with(PlanModel.resource_model)
-    def get(self, ctx_id):
+    def get(self, plan_id):
         """Get one Plan"""
-        result = PlanModel.query.filter_by().first_or_404
+        result = PlanModel.query.filter_by(id=plan_id).first_or_404
         return result, 200
 
 
@@ -46,17 +46,17 @@ class Plan(BaseResource):
     @plan_ns.response(204, 'Plan deleted')
     def delete(self, ctx_id):
         """Delete Plan"""
-        result = PlanModel.query.filter_by().first_or_404()
+        result = PlanModel.query.filter_by(id=plan_id).first_or_404()
         db.session.delete(result)
         db.session.commit()
         return result, 204
         
     @plan_ns.expect(PlanModel.register_model)  
     @plan_ns.marshal_with(PlanModel.resource_model)
-    def put(self, ctx_id):
+    def put(self, plan_id):
         """Edit Plan""" 
         data = api.payload
-        result = PlanModel.query.filter_by()
+        result = PlanModel.query.filter_by(id=plan_id)
         result.update(data)
         db.session.commit()
         result = result.first()
