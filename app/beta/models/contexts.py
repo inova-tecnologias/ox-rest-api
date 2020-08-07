@@ -10,8 +10,9 @@ class Context(db.Model):
     maxQuota = db.Column(db.Integer, default=500)
     usedQuota = db.Column(db.Integer, default=0)
     enabled = db.Column(db.Boolean, default=True)
-    #admin = db.Column(db.String(150), unique=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)    
+    admin = db.Column(db.String(200))
+    password = db.Column(db.String(200))
 
     @property
     def ox_id(self):
@@ -24,8 +25,7 @@ class Context(db.Model):
     # Models
     register_model = api.model('Register Context', {
     'name': fields.String(required=True),
-    'password': fields.String(required=True),
-    'maxQuota': fields.Integer(),
+    'description': fields.String(required=True),
     'customer_id': fields.Integer()
     })
     
@@ -33,12 +33,9 @@ class Context(db.Model):
     'id': fields.Integer(),
     'name': fields.String(),
     'usedQuota': fields.Integer(),
-    'maxQuota': fields.Integer(),
     'enabled': fields.Boolean(),
     'ox_id': fields.Integer(),
     'customer_id': fields.Integer(),
-
-    #'admin': fields.String(),
     })  
 
 
