@@ -1,1 +1,1 @@
-from .functions import get_random_string
+from .functions import random_pass
