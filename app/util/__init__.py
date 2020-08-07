@@ -1,1 +1,1 @@
-from .functions import random_pass
+from .functions import random_password
