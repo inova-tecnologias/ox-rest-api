@@ -110,3 +110,63 @@ class Ctx(BaseResource):
         db.session.commit()
         result = result.first()
         return result, 200
+
+
+from ..models.groups import Group as GroupModel
+
+@ctx_ns.route('/<ctx_id>/groups')
+class GroupList(BaseResource):
+    @ctx_ns.marshal_with(GroupModel.resource_model)
+    def get(self, ctx_id):
+        """Get the list of groups"""
+        customer_id = get_jwt_claims()['customer_id']
+        permited_contexts = get_jwt_claims()['contexts']
+
+        if customer_id:
+            condition = GroupModel.ctx_id.in_(permited_contexts)
+        else:
+            condition = True
+        
+        validation={'ctx_id': ctx_id}
+        result = self.paginate(GroupModel, condition=condition, validation=validation)
+        return result.items, {'X-Total-Count': result.total}
+
+
+    @group_ns.marshal_with(GroupModel.resource_model)
+    @group_ns.expect(GroupModel.register_model, validate=True)
+    def post(self, ctx_id):
+        """Insert a Group"""
+        data = api.payload
+        data.update({'ctx_id': ctxid})
+        data.update({'ox_id': ctxid})
+        instance = self.make_instance(GroupModel, data)
+        db.session.add(instance)
+        db.session.commit()
+        return instance
+
+
+@ctx_ns.route('/<ctx_id>/groups/<grp_id>')
+class Group(BaseResource):
+    @group_ns.marshal_with(GroupModel.resource_model)
+    def get(self, ctx_id, grp_id):
+        customer_id = get_jwt_claims()['customer_id']
+        permited_contexts = get_jwt_claims()['contexts']
+
+        if customer_id:
+            condition = GroupModel.ctx_id.in_(permited_contexts)
+        else:
+            condition = True
+        
+        result = GroupModel.query.filter(condition).filter_by(id=grp_id, ctx_id=ctx_id).first_or_404()
+        return result
+
+
+    @group_ns.marshal_with(GroupModel.resource_model)
+    @group_ns.response(404, 'group Not Found')
+    @group_ns.response(204, 'group deleted')
+    def delete(self, mbx_id):
+        """Delete group"""
+        result = GroupModel.query.filter(condition).filter_by(id=grp_id, ctx_id=ctx_id).first_or_404()
+        db.session.delete(result)
+        db.session.commit()
+        return result, 200
