@@ -26,8 +26,6 @@ from .resources.users import user_ns
 from .resources.customers import customer_ns
 from .resources.contexts import ctx_ns
 from .resources.mailboxes import mbx_ns
-from .resources.groups import group_ns
-from .resources.groups import group_ns
 from .resources.plans import plan_ns
 
 
@@ -37,7 +35,6 @@ api.add_namespace(user_ns)
 api.add_namespace(customer_ns)
 api.add_namespace(ctx_ns)
 api.add_namespace(mbx_ns)
-api.add_namespace(group_ns)
 api.add_namespace(plan_ns)
 
 

@@ -36,6 +36,12 @@ class Context(db.Model):
     'enabled': fields.Boolean(),
     'ox_id': fields.Integer(),
     'customer_id': fields.Integer(),
+    })
+
+    theme_model = api.model('Theming', {
+        'mainColor': fields.String(),
+        'logoURL': fields.String(),
+        'logoWidth': fields.Integer(default=60),
     })  
 
 

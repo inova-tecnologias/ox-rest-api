@@ -132,8 +132,8 @@ class GroupList(BaseResource):
         return result.items, {'X-Total-Count': result.total}
 
 
-    @group_ns.marshal_with(GroupModel.resource_model)
-    @group_ns.expect(GroupModel.register_model, validate=True)
+    @ctx_ns.marshal_with(GroupModel.resource_model)
+    @ctx_ns.expect(GroupModel.register_model, validate=True)
     def post(self, ctx_id):
         """Insert a Group"""
         data = api.payload
@@ -147,7 +147,7 @@ class GroupList(BaseResource):
 
 @ctx_ns.route('/<ctx_id>/groups/<grp_id>')
 class Group(BaseResource):
-    @group_ns.marshal_with(GroupModel.resource_model)
+    @ctx_ns.marshal_with(GroupModel.resource_model)
     def get(self, ctx_id, grp_id):
         customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
@@ -161,12 +161,36 @@ class Group(BaseResource):
         return result
 
 
-    @group_ns.marshal_with(GroupModel.resource_model)
-    @group_ns.response(404, 'group Not Found')
-    @group_ns.response(204, 'group deleted')
+    @ctx_ns.marshal_with(GroupModel.resource_model)
+    @ctx_ns.response(404, 'group Not Found')
+    @ctx_ns.response(204, 'group deleted')
     def delete(self, mbx_id):
         """Delete group"""
         result = GroupModel.query.filter(condition).filter_by(id=grp_id, ctx_id=ctx_id).first_or_404()
         db.session.delete(result)
         db.session.commit()
         return result, 200
+
+@ctx_ns.route('/<ctx_id>/theme')
+class Theme(BaseResource):
+    @ctx_ns.marshal_with(CtxModel.theme_model)
+    @ctx_ns.expect(CtxModel.theme_model, validate=True)
+    @ctx_ns.response(200, 'Theme updated')
+    def put(self, ctx_id):
+        """Set Context theme"""
+        data = api.payload
+        entries = []
+        for entrie in data:
+            entries.append({'key' : 'io.ox/dynamic-theme//' + entrie, 'value': data[entrie]})
+        context = {
+            'id': ctx_id,
+            "userAttributes": {
+                "entries": {
+                    "key": "config",
+                    "value": {
+                        "entries": entries 
+                    }
+                }
+            }
+        }
+        OXCtx.service.change(auth=oxcreds, ctx=context)
