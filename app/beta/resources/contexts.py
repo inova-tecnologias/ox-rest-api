@@ -13,6 +13,7 @@ from ..soap.ox import (
 )
 
 ctx_ns = Namespace('Contexts', path='/contexts')
+theme_ns = Namespace('Theme', path='/theme')
 
 
 @ctx_ns.route('/')
@@ -179,6 +180,34 @@ class Theme(BaseResource):
     def put(self, ctx_id):
         """Set Context theme"""
         data = api.payload
+        entries = []
+        for entrie in data:
+            entries.append({'key' : 'io.ox/dynamic-theme//' + entrie, 'value': data[entrie]})
+        context = {
+            'id': ctx_id,
+            "userAttributes": {
+                "entries": {
+                    "key": "config",
+                    "value": {
+                        "entries": entries 
+                    }
+                }
+            }
+        }
+        OXCtx.service.change(auth=oxcreds, ctx=context)
+
+
+@theme_ns.route('/')
+class ExtTheme(BaseResource):
+    @ctx_ns.marshal_with(CtxModel.theme_model)
+    @ctx_ns.expect(CtxModel.theme_model, validate=True)
+    @ctx_ns.response(200, 'Theme updated')
+    def post(self):
+        """Set Context theme"""
+        data = api.payload
+        print(data)
+        ctx_id = data.pop('ctx_id')
+        
         entries = []
         for entrie in data:
             entries.append({'key' : 'io.ox/dynamic-theme//' + entrie, 'value': data[entrie]})

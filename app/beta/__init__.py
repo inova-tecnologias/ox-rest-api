@@ -24,7 +24,7 @@ api = Api(blueprint,
 from .resources.auth import auth_ns
 from .resources.users import user_ns
 from .resources.customers import customer_ns
-from .resources.contexts import ctx_ns
+from .resources.contexts import ctx_ns, theme_ns
 from .resources.mailboxes import mbx_ns
 from .resources.plans import plan_ns
 
@@ -36,5 +36,5 @@ api.add_namespace(customer_ns)
 api.add_namespace(ctx_ns)
 api.add_namespace(mbx_ns)
 api.add_namespace(plan_ns)
-
+api.add_namespace(theme_ns)
 

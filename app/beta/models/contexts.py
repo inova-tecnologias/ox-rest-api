@@ -25,7 +25,7 @@ class Context(db.Model):
     # Models
     register_model = api.model('Register Context', {
     'name': fields.String(required=True),
-    'description': fields.String(required=True),
+    'description': fields.String(),
     'customer_id': fields.Integer()
     })
     
@@ -39,6 +39,7 @@ class Context(db.Model):
     })
 
     theme_model = api.model('Theming', {
+        'ctx_id': fields.Integer(),
         'mainColor': fields.String(),
         'logoURL': fields.String(),
         'logoWidth': fields.Integer(default=60),
