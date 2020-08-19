@@ -2,7 +2,6 @@ from flask_restplus import fields
 
 from app import db
 from .. import api
-from ..models.groups import association_table
 
 
 class Mailbox(db.Model):
@@ -15,7 +14,6 @@ class Mailbox(db.Model):
     usedQuota = db.Column(db.Integer, default=0)
     plan_id = db.Column(db.Integer, nullable=False)
     enabled = db.Column(db.Boolean, default=True)
-    groups = db.relationship("Group", secondary=association_table)
     ox_id = db.Column(db.Integer, nullable=False)
     ctx_id = db.Column(db.Integer, db.ForeignKey('context.id'))
     
@@ -58,3 +56,9 @@ class Mailbox(db.Model):
     'aliases': fields.List(fields.String())
     })
 
+    edit_model = api.model('Edit Mailbox', {
+    'plan_id': fields.Integer(),
+    'password': fields.String(),
+    'enabled': fields.Boolean(),
+    'ctx_id': fields.Integer()
+    })

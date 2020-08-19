@@ -118,7 +118,7 @@ class Mbx(BaseResource):
         db.session.commit()
         return result
 
-    @mbx_ns.expect(MbxModel.register_model)  
+    @mbx_ns.expect(MbxModel.edit_model)  
     @mbx_ns.marshal_with(MbxModel.resource_model)
     def put(self, mbx_id):
         """Edit Mailbox"""
@@ -132,11 +132,42 @@ class Mbx(BaseResource):
         else:
             condition = True
         
-        result = MbxModel.query.filter(condition).filter_by(id=mbx_id)
+        result = MbxModel.query.filter(condition).filter_by(id=mbx_id).first_or_404()
         
-        result.update(data)
+        plan_id = data.pop('plan_id', None)
+        if plan_id:
+            plan = PlanModel.query.filter_by(id=plan_id).first_or_404()
+            maxQuota = plan.quota * 1024
+            oxplan =  plan.oxid
+            OXMbx.service.changeByModuleAccessName(
+                auth=oxcreds,
+                user={'id': result.ox_id},
+                ctx={'id': result.ctx_id},
+                access_combination_name=oxplan
+            )
+
+            OXaaS.service.setMailQuota(
+                ctxid = result.ctx_id,
+                usrid = result.ox_id,
+                quota = maxQuota,
+                creds = oxcreds
+            )
+            result.maxQuota=maxQuota
+            result.plan_id=plan_id  
+
+        oxdata = data.copy()
+        oxdata['id'] = result.ox_id
+        if data.get('enabled') != None:
+            oxdata['mailenabled'] = oxdata.pop('enabled')
+
+        OXMbx.service.change(
+            auth=oxcreds,
+            usrdata=oxdata,
+            ctx={'id': result.ctx_id}
+        )
+
+        print(data)
         db.session.commit()
-        result = result.first()
         return result, 200
         
         
