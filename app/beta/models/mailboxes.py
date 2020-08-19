@@ -60,5 +60,4 @@ class Mailbox(db.Model):
     'plan_id': fields.Integer(),
     'password': fields.String(),
     'enabled': fields.Boolean(),
-    'ctx_id': fields.Integer()
     })
