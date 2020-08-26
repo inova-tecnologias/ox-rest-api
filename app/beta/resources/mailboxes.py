@@ -39,6 +39,19 @@ class MbxList(BaseResource):
         maxQuota = plan.quota * 1024
         oxplan =  plan.oxid
         aliases = data.pop('aliases', [])
+        userAttributes = {
+            "userAttributes": {
+                "entries": {
+                    "key": "config",
+                    "value": {
+                        "entries": {
+                            "key": "com.openexchange.unifiedquota.enabled",
+                            "value": "true"
+                        } 
+                    }
+                }
+            }
+        }
         mailbox = {
             'name': data['email'],
             'aliases': aliases,
@@ -51,11 +64,14 @@ class MbxList(BaseResource):
             'sur_name': data['last_name'],
             'primaryEmail': data['email'],
             'email1': data['email'],
+            'maxQuota': maxQuota,
             'defaultSenderAddress': data['email'],
             'language': 'pt_BR',
             'timezone': 'America/Sao_Paulo',
         }
 
+        mailbox.update(userAttributes)
+        
         mbxid = OXMbx.service.createByModuleAccessName(
             auth=oxcreds,
             usrdata=mailbox,
@@ -123,7 +139,7 @@ class Mbx(BaseResource):
     def put(self, mbx_id):
         """Edit Mailbox"""
         data = api.payload
-        data.pop('display_name', None) # TODO: remove display_name
+        data = {key: data[key] for key in MbxModel.edit_model.keys() & data}
         customer_id = get_jwt_claims()['customer_id']
         permited_contexts = get_jwt_claims()['contexts']
 
@@ -141,7 +157,10 @@ class Mbx(BaseResource):
             oxplan =  plan.oxid
             OXMbx.service.changeByModuleAccessName(
                 auth=oxcreds,
-                user={'id': result.ox_id},
+                user={
+                    'id': result.ox_id,
+                    'maxQuota': maxQuota
+                    },
                 ctx={'id': result.ctx_id},
                 access_combination_name=oxplan
             )
@@ -166,7 +185,6 @@ class Mbx(BaseResource):
             ctx={'id': result.ctx_id}
         )
 
-        print(data)
         db.session.commit()
         return result, 200
         
