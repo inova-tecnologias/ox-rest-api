@@ -8,11 +8,10 @@ from app import db
 from .. import api
 
 
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     isAdmin = db.Column(db.Boolean(), nullable=False, default=False)
-    username = db.Column(db.String(30), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(50))
     description = db.Column(db.String(200))
     
