@@ -18,7 +18,6 @@ credentials = {
     'password': getenv('OXAASADMPASS')
 }
 
-
 Context = removePort80(
     Client('https://' + oxaashost + '/webservices/OXResellerContextService?wsdl')
 )
@@ -33,4 +32,5 @@ Resource = removePort80(
     Client('https://' + oxaashost + '/webservices/OXResellerResourceService?wsdl')
 )
 OxaaSService = removePort80(
-    Client('https://' + oxaashost + '/webservices/OXaaSService?wsdl'))
+    Client('https://' + oxaashost + '/webservices/OXaaSService?wsdl')
+)
