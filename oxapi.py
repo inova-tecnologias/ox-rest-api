@@ -17,6 +17,10 @@ manager.add_command('db', MigrateCommand)
 def create():
     """Create Application Database if don't exists"""
     db.create_all()
+    from alembic.config import Config
+    from alembic import command
+    alembic_cfg = Config("migrations/alembic.ini")
+    command.stamp(alembic_cfg, "head")
 
 @MigrateCommand.command
 def destroy():
