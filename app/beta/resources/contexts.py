@@ -38,10 +38,10 @@ class CtxList(BaseResource):
         sur_name = "Context Admin"
 
         ctxname = (oxaasadmctx, name)
-        mail = "oxadmin@%s_%s" %ctxname
-        
+        mail = "oxadmin@%s-%s" %ctxname
+        print(mail)
         admin_user = {
-            'name': "oxadmin+%s_%s" %ctxname,
+            'name': "oxadmin_%s_%s" %ctxname,
             'password': password,
             'display_name': "%s %s" %(name, sur_name),
             'given_name': name,
