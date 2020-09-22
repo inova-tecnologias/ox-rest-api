@@ -22,6 +22,7 @@ class Customer(db.Model):
     register_model = api.model('Register Customer', {
     'name': fields.String(required=True),
     'cnpj': fields.String(required=True),
+    'reseller_id': fields.Integer(),
     'description': fields.String()
     })
     
@@ -30,6 +31,7 @@ class Customer(db.Model):
     'name': fields.String(),
     'cnpj': fields.String(),
     'description': fields.String(),
+    'reseller_id': fields.Integer(),
     'users': fields.Nested(user_model),
     'contexts': fields.Nested(context_model)
     }) 

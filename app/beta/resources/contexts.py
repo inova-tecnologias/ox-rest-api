@@ -80,10 +80,14 @@ class Ctx(BaseResource):
     @ctx_ns.response(204, 'Context deleted')
     def delete(self, ctx_id):
         """Delete Context"""
-        cid = get_jwt_claims()['customer_id']
+        claims = get_jwt_claims()
+        cid = claims['customer_id']
+        rid = claims['reseller_id']
         query = {'id': ctx_id}
         if cid:
             query.update({'customer_id': cid})
+        if rid:
+            query.update({'reseller_id': rid})
 
         result = CtxModel.query.filter_by(**query).first_or_404()
         db.session.delete(result)
@@ -104,6 +108,8 @@ class Ctx(BaseResource):
         query = {'id': ctx_id}
         if cid:
             query.update({'customer_id': cid})
+        if rid:
+            query.update({'reseller_id': rid})
 
         result = CtxModel.query.filter_by(**query)
 

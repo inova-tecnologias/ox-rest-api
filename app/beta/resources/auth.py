@@ -27,6 +27,7 @@ def admin():
         'username',
         'password',
         'isAdmin',
+        'reseller_id',
         'customer_id'
     ]:
         model.__delitem__(attr)
@@ -55,6 +56,8 @@ def add_claims_to_access_token(identity):
     user = UserModel.query.filter_by(username=identity).first()
     
     customer_id = user.customer_id
+    reseller_id = user.reseller_id
+
     if customer_id:
         customer = CustomerModel.query.filter_by(id=user.customer_id).first()
         contexts = [context.id for context in customer.contexts]
@@ -66,6 +69,7 @@ def add_claims_to_access_token(identity):
         name = user.name,
         username = user.username,
         isAdmin = user.isAdmin,
+        reseller_id = reseller_id,
         customer_id = customer_id,
         contexts = contexts
     )

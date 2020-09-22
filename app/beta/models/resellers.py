@@ -3,7 +3,7 @@ from flask_restplus import fields
 from app import db
 from .. import api
 from ..models.users import User
-from ..models.customer import customer
+from ..models.customers import Customer
 
 
 user_model = User.resource_model
@@ -30,5 +30,5 @@ class Reseller(db.Model):
     'cnpj': fields.String(),
     'description': fields.String(),
     'users': fields.Nested(user_model),
-    'reseller': fields.Nested(context_model)
+    'customers': fields.Nested(customer_model),
     }) 

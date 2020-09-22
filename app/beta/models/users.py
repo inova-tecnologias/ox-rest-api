@@ -14,7 +14,7 @@ class User(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(50))
     description = db.Column(db.String(200))
-    
+    reseller_id = db.Column(db.Integer, db.ForeignKey('reseller.id'))    
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))    
     
     password_hash = db.Column(db.String(150), nullable=False)
@@ -35,6 +35,7 @@ class User(db.Model):
         'isAdmin': fields.Boolean(),
         'name': fields.String(),
         'description': fields.String(),
+        'reseller_id': fields.Integer(),
         'customer_id': fields.Integer()
 
 
@@ -46,6 +47,7 @@ class User(db.Model):
     'isAdmin': fields.Boolean(default=False),
     'name': fields.String(),
     'description': fields.String(),
+    'reseller_id': fields.Integer(),
     'customer_id': fields.Integer()
 
     })
