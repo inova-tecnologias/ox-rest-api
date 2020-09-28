@@ -41,7 +41,7 @@ class User(db.Model):
     resource_model = api.model('User', {
         'id': fields.Integer(),
         'username': fields.String(),
-        'isAdmin': fields.Boolean(),
+        'role': fields.String(),
         'name': fields.String(),
         'description': fields.String(),
         'reseller_id': fields.Integer(),
