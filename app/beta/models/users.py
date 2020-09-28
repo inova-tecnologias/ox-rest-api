@@ -53,7 +53,6 @@ class User(db.Model):
     register_model = api.model('Register User', {
     'username': fields.String(required=True),
     'password': fields.String(required=True),
-    'isAdmin': fields.Boolean(default=False),
     'name': fields.String(),
     'description': fields.String(),
     'reseller_id': fields.Integer(),
