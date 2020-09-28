@@ -73,7 +73,7 @@ def add_claims_to_access_token(identity):
         id = user.id,
         name = user.name,
         username = user.username,
-        isAdmin = user.isAdmin,
+        role = user.role,
         reseller_id = reseller_id,
         customer_id = customer_id,
         contexts = contexts
