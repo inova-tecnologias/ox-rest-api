@@ -61,6 +61,11 @@ def add_claims_to_access_token(identity):
     if customer_id:
         customer = CustomerModel.query.filter_by(id=user.customer_id).first()
         contexts = [context.id for context in customer.contexts]
+    elif reseller_id:
+        contexts = []
+        customers = CustomerModel.query.filter_by(reseller_id=reseller_id).all()
+        for customer in customers:
+            contexts += [context.id for context in customer.contexts]
     else:
         contexts = []
         

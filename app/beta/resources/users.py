@@ -31,8 +31,12 @@ class UserList(BaseResource):
             })
     def get(self):
         """Get the list of users"""
-        customer_id = get_jwt_claims()['customer_id']
-        validation = {'customer_id': customer_id} if customer_id else {}    
+        claims = get_jwt_claims()
+        customer_id = claims['customer_id']
+        reseller_id = claims['reseller_id']
+        validation = {'customer_id': customer_id} if customer_id else {}
+        if reseller_id:
+            validation.update({'reseller_id': reseller_id})
         result = self.paginate(UserModel, validation=validation)
         return result.items, {'X-Total-Count': result.total}
 

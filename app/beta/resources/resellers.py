@@ -23,8 +23,9 @@ class ResellerList(BaseResource):
     })
     def get(self):
         """Get the list of Resellers"""
-        reseller_id = get_jwt_claims()['reseller_id']
-        validation = {'id': reseller_id} if reseller_id else {}    
+        claims = get_jwt_claims()
+        reseller_id = claims['reseller_id']
+        validation = {'id': reseller_id} if reseller_id else {}  
         result = self.paginate(ResellerModel, validation=validation)
         return result.items, {'X-Total-Count': result.total}
 

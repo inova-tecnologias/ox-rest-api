@@ -19,10 +19,12 @@ class MbxList(BaseResource):
     @mbx_ns.marshal_with(MbxModel.resource_model)
     def get(self):
         """Get the list of Mailboxes"""
-        customer_id = get_jwt_claims()['customer_id']
-        permited_contexts = get_jwt_claims()['contexts']
+        claims = get_jwt_claims()
+        customer_id = claims['customer_id']
+        reseller_id = claims['reseller_id']
+        permited_contexts = claims['contexts']
 
-        if customer_id:
+        if customer_id or reseller_id:
             condition = MbxModel.ctx_id.in_(permited_contexts)
         else:
             condition = True
