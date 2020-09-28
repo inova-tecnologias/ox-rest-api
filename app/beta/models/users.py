@@ -10,7 +10,6 @@ from .. import api
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    isAdmin = db.Column(db.Boolean(), nullable=False, default=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(50))
     description = db.Column(db.String(200))
@@ -19,6 +18,16 @@ class User(db.Model):
     
     password_hash = db.Column(db.String(150), nullable=False)
 
+    @property
+    def role(self):
+        if self.customer_id:
+            role = "customer"
+        elif self.reseller_id:
+            role = "reseller"
+        else:
+            role = "admin"
+
+        return role
 
     @property
     def password(self):
