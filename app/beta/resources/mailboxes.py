@@ -5,12 +5,7 @@ from .base import BaseResource
 from .. import api
 from ..models.mailboxes import Mailbox as MbxModel
 from ..models.plans import Plan as PlanModel
-from ..soap.ox import (
-    oxaasadmctx, 
-    credentials as oxcreds,
-    User as OXMbx,
-    OxaaSService as OXaaS
-)
+
 
 mbx_ns = Namespace('Mailboxes', path='/mailboxes')
 
@@ -41,54 +36,6 @@ class MbxList(BaseResource):
         maxQuota = plan.quota * 1024
         oxplan =  plan.oxid
         aliases = data.pop('aliases', [])
-        userAttributes = {
-            "userAttributes": {
-                "entries": {
-                    "key": "config",
-                    "value": {
-                        "entries": {
-                            "key": "com.openexchange.unifiedquota.enabled",
-                            "value": "true"
-                        } 
-                    }
-                }
-            }
-        }
-        mailbox = {
-            'name': data['email'],
-            'aliases': aliases,
-            'password': data['password'],
-            'display_name': "%s %s" %(
-                data['given_name'], 
-                data['last_name']
-            ),
-            'given_name': data['given_name'],
-            'sur_name': data['last_name'],
-            'primaryEmail': data['email'],
-            'email1': data['email'],
-            'maxQuota': maxQuota,
-            'defaultSenderAddress': data['email'],
-            'language': 'pt_BR',
-            'timezone': 'America/Sao_Paulo',
-        }
-
-        mailbox.update(userAttributes)
-        
-        mbxid = OXMbx.service.createByModuleAccessName(
-            auth=oxcreds,
-            usrdata=mailbox,
-            ctx={'id': data['ctx_id']},
-            access_combination_name=oxplan
-        )['id']
-
-        OXaaS.service.setMailQuota(
-            ctxid = data['ctx_id'],
-            usrid = mbxid,
-            quota = maxQuota,
-            creds = oxcreds
-        )
-
-        data.update({'ox_id': mbxid, 'maxQuota': maxQuota})
         instance = self.make_instance(MbxModel, data)
         db.session.add(instance)
         db.session.commit()
@@ -126,12 +73,7 @@ class Mbx(BaseResource):
         else:
             condition = True
         
-        result = MbxModel.query.filter(condition).filter_by(id=mbx_id).first_or_404()
-        OXMbx.service.delete(
-            auth=oxcreds,
-            ctx={'id': result.ctx_id},
-            user={'id': result.ox_id}
-            )        
+        result = MbxModel.query.filter(condition).filter_by(id=mbx_id).first_or_404()     
         db.session.delete(result)
         db.session.commit()
         return result
@@ -157,22 +99,6 @@ class Mbx(BaseResource):
             plan = PlanModel.query.filter_by(id=plan_id).first_or_404()
             maxQuota = plan.quota * 1024
             oxplan =  plan.oxid
-            OXMbx.service.changeByModuleAccessName(
-                auth=oxcreds,
-                user={
-                    'id': result.ox_id,
-                    'maxQuota': maxQuota
-                    },
-                ctx={'id': result.ctx_id},
-                access_combination_name=oxplan
-            )
-
-            OXaaS.service.setMailQuota(
-                ctxid = result.ctx_id,
-                usrid = result.ox_id,
-                quota = maxQuota,
-                creds = oxcreds
-            )
             result.maxQuota=maxQuota
             result.plan_id=plan_id  
 
@@ -180,12 +106,6 @@ class Mbx(BaseResource):
         oxdata['id'] = result.ox_id
         if data.get('enabled') != None:
             oxdata['mailenabled'] = oxdata.pop('enabled')
-
-        OXMbx.service.change(
-            auth=oxcreds,
-            usrdata=oxdata,
-            ctx={'id': result.ctx_id}
-        )
 
         db.session.commit()
         return result, 200

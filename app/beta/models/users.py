@@ -70,8 +70,3 @@ class User(db.Model):
     'refresh_token': fields.String(required=True)
     })
     
-
-@event.listens_for(User, 'before_insert')
-def teste(m, c, t):
-    print("Start Load")
-    print (m, c, t)
