@@ -34,7 +34,6 @@ def admin():
     user.username = input('Username: ')
     from getpass import getpass
     user.password = getpass()
-    user.isAdmin = True
 
     for attr in model.keys():
         setattr(user, attr, input(attr.capitalize() + ": "))
@@ -57,17 +56,6 @@ def add_claims_to_access_token(identity):
     customer_id = user.customer_id
     reseller_id = user.reseller_id
 
-    if customer_id:
-        customer = CustomerModel.query.filter_by(id=user.customer_id).first()
-        contexts = [context.id for context in customer.contexts]
-    elif reseller_id:
-        contexts = []
-        customers = CustomerModel.query.filter_by(reseller_id=reseller_id).all()
-        for customer in customers:
-            contexts += [context.id for context in customer.contexts]
-    else:
-        contexts = []
-        
     claims = dict(
         id = user.id,
         name = user.name,
@@ -75,7 +63,6 @@ def add_claims_to_access_token(identity):
         role = user.role,
         reseller_id = reseller_id,
         customer_id = customer_id,
-        contexts = contexts
     )
     return claims
 
