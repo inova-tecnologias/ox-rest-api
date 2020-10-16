@@ -37,14 +37,14 @@ class CtxList(BaseResource):
         return instance, 201
 
 
-@ctx_ns.route('/<ctx_id>')
+@ctx_ns.route('/<context_id>')
 class Ctx(BaseResource):
     @ctx_ns.response(404, 'Context Not Found')
     @ctx_ns.marshal_with(CtxModel.resource_model)
-    def get(self, ctx_id):
+    def get(self, context_id):
         """Get one Context"""
         cid = get_jwt_claims()['customer_id']
-        query = {'id': ctx_id}
+        query = {'id': context_id}
         if cid:
             query.update({'customer_id': cid})
 
@@ -54,12 +54,12 @@ class Ctx(BaseResource):
     @ctx_ns.marshal_with(CtxModel.resource_model)
     @ctx_ns.response(404, 'Context Not Found')
     @ctx_ns.response(204, 'Context deleted')
-    def delete(self, ctx_id):
+    def delete(self, context_id):
         """Delete Context"""
         claims = get_jwt_claims()
         cid = claims['customer_id']
         rid = claims['reseller_id']
-        query = {'id': ctx_id}
+        query = {'id': context_id}
         if cid:
             query.update({'customer_id': cid})
         if rid:
@@ -72,7 +72,7 @@ class Ctx(BaseResource):
         
     @ctx_ns.expect(CtxModel.register_model)  
     @ctx_ns.marshal_with(CtxModel.resource_model)
-    def put(self, ctx_id):
+    def put(self, context_id):
         """Edit Context""" 
         data = api.payload
         data.pop('mailboxes', None) # TODO: update mailboxes instead ignore
@@ -80,7 +80,8 @@ class Ctx(BaseResource):
         data.pop('ox_id', None) # ox_id is alias for id
 
         cid = get_jwt_claims()['customer_id']
-        query = {'id': ctx_id}
+        rid = get_jwt_claims()['reseller_id']
+        query = {'id': context_id}
         if cid:
             query.update({'customer_id': cid})
         if rid:
@@ -94,19 +95,19 @@ class Ctx(BaseResource):
         return result, 200
 
 
-@ctx_ns.route('/<ctx_id>/theme')
+@ctx_ns.route('/<context_id>/theme')
 class Theme(BaseResource):
     @ctx_ns.marshal_with(CtxModel.theme_model)
     @ctx_ns.expect(CtxModel.theme_model, validate=True)
     @ctx_ns.response(200, 'Theme updated')
-    def put(self, ctx_id):
+    def put(self, context_id):
         """Set Context theme"""
         data = api.payload
         entries = []
         for entrie in data:
             entries.append({'key' : 'io.ox/dynamic-theme//' + entrie, 'value': data[entrie]})
         context = {
-            'id': ctx_id,
+            'id': context_id,
             "userAttributes": {
                 "entries": {
                     "key": "config",
@@ -126,13 +127,13 @@ class ExtTheme(BaseResource):
     def post(self):
         """Set Context theme"""
         data = api.payload
-        ctx_id = data.pop('ctx_id')
+        context_id = data.pop('context_id')
         
         entries = []
         for entrie in data:
             entries.append({'key' : 'io.ox/dynamic-theme//' + entrie, 'value': data[entrie]})
         context = {
-            'id': ctx_id,
+            'id': context_id,
             "userAttributes": {
                 "entries": {
                     "key": "config",

@@ -44,7 +44,7 @@ class Plan(BaseResource):
     @plan_ns.marshal_with(PlanModel.resource_model)
     @plan_ns.response(404, 'Plan Not Found')
     @plan_ns.response(204, 'Plan deleted')
-    def delete(self, ctx_id):
+    def delete(self, context_id):
         """Delete Plan"""
         result = PlanModel.query.filter_by(id=plan_id).first_or_404()
         db.session.delete(result)

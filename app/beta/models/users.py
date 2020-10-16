@@ -1,6 +1,7 @@
 from flask_restplus import fields
 from werkzeug.security import generate_password_hash
 from sqlalchemy import event
+from datetime import datetime
 
 
 
@@ -11,6 +12,8 @@ from .. import api
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    changed = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     name = db.Column(db.String(50))
     description = db.Column(db.String(200))
     reseller_id = db.Column(db.Integer, db.ForeignKey('reseller.id'))    

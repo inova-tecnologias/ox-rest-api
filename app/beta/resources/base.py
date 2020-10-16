@@ -122,8 +122,8 @@ class BaseResource(Resource):
 
         if customer_id and model.resource_model.get('customer_id'):
             query = query.update({'customer_id': customer_id})
-        if customer_id and model.resource_model.get('ctx_id'):
-            result = result.filter(model.ctx_id.in_(permited_contexts))
+        if customer_id and model.resource_model.get('context_id'):
+            result = result.filter(model.context_id.in_(permited_contexts))
 
 
         result = result.filter_by(**query).order_by(text(sorter)).paginate(**pagination)

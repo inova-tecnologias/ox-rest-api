@@ -3,15 +3,16 @@ from flask_restplus import fields
 from app import db
 from .. import api
 from ..models.users import User
-from ..models.contexts import Context
+from datetime import datetime
 
 
 user_model = User.resource_model
-context_model = Context.resource_model
 
 class Customer(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    changed = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     description = db.Column(db.String(256))
     cnpj = db.Column(db.String(20))
     users = db.relationship('User', backref='customer', lazy=True)
@@ -33,5 +34,4 @@ class Customer(db.Model):
     'description': fields.String(),
     'reseller_id': fields.Integer(),
     'users': fields.Nested(user_model),
-    'contexts': fields.Nested(context_model)
     }) 

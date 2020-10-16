@@ -2,11 +2,14 @@ from flask_restplus import fields
 
 from app import db
 from .. import api
+from datetime import datetime
 
 
 class Plan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    changed = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     oxid = db.Column(db.String(50))
     description = db.Column(db.String(50))
     quota = db.Column(db.Integer)

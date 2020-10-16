@@ -20,7 +20,7 @@ class MbxList(BaseResource):
         permited_contexts = claims['contexts']
 
         if customer_id or reseller_id:
-            condition = MbxModel.ctx_id.in_(permited_contexts)
+            condition = MbxModel.context_id.in_(permited_contexts)
         else:
             condition = True
         result = self.paginate(MbxModel, condition=condition)
@@ -52,7 +52,7 @@ class Mbx(BaseResource):
         permited_contexts = get_jwt_claims()['contexts']
 
         if customer_id:
-            condition = MbxModel.ctx_id.in_(permited_contexts)
+            condition = MbxModel.context_id.in_(permited_contexts)
         else:
             condition = True
         
@@ -69,7 +69,7 @@ class Mbx(BaseResource):
         permited_contexts = get_jwt_claims()['contexts']
 
         if customer_id:
-            condition = MbxModel.ctx_id.in_(permited_contexts)
+            condition = MbxModel.context_id.in_(permited_contexts)
         else:
             condition = True
         
@@ -88,7 +88,7 @@ class Mbx(BaseResource):
         permited_contexts = get_jwt_claims()['contexts']
 
         if customer_id:
-            condition = MbxModel.ctx_id.in_(permited_contexts)
+            condition = MbxModel.context_id.in_(permited_contexts)
         else:
             condition = True
         

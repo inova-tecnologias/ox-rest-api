@@ -20,6 +20,7 @@ def create():
     from alembic.config import Config
     from alembic import command
     alembic_cfg = Config("migrations/alembic.ini")
+    alembic_cfg.set_main_option("script_location", "migrations")
     command.stamp(alembic_cfg, "head")
 
 @MigrateCommand.command

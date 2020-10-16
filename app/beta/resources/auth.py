@@ -26,7 +26,6 @@ def admin():
     for attr in [
         'username',
         'password',
-        'isAdmin',
         'reseller_id',
         'customer_id'
     ]:
