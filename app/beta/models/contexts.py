@@ -28,6 +28,7 @@ class Context(db.Model):
     register_model = api.model('Register Context', {
     'name': fields.String(required=True),
     'description': fields.String(),
+    'reseller_id': fields.Integer(),
     'customer_id': fields.Integer()
     })
     

@@ -23,24 +23,18 @@ class CustomerList(BaseResource):
     })
     def get(self):
         """Get the list of Customers"""
-        claims = get_jwt_claims()
-        customer_id = claims['customer_id']
-        reseller_id = claims['reseller_id']
-        validation = {'id': customer_id} if customer_id else {}
-        if reseller_id:
-            validation.update({'reseller_id': reseller_id})
-        result = self.paginate(CustomerModel, validation=validation)
-        return result.items, {'X-Total-Count': result.total}
+        validation = self.validate(CustomerModel, roles=['admin', 'reseller'])
+        return self.get_many(CustomerModel, validation=validation)
 
     @customer_ns.expect(CustomerModel.register_model, validate=True)
     @customer_ns.marshal_with(CustomerModel.resource_model)
     def post(self):
         """Insert a Customer"""
-        data = api.payload        
-        customer = self.make_instance(CustomerModel, data)
-        db.session.add(customer)
-        db.session.commit()
-        return customer
+        validation = self.validate(CustomerModel, roles=['admin', 'reseller'])
+        data = api.payload   
+        data.update(validation)
+             
+        return self.insert_one(CustomerModel, data)
 
 
 @customer_ns.route('/<int:customer_id>')
@@ -49,44 +43,26 @@ class Customer(BaseResource):
     @customer_ns.marshal_with(CustomerModel.resource_model)
     def get(self, customer_id):
         """Get one Customer"""
-        cid = get_jwt_claims()['customer_id']
-        query = {'id': customer_id}
-        if ((cid) and (cid != customer_id)):
-            query.update({'id': False})
-
-        result = CustomerModel.query.filter_by(**query).first_or_404()
-        return result
+        validation = self.validate(CustomerModel, roles=['admin', 'reseller'])
+        return self.get_one(CustomerModel, customer_id, validation)
 
 
     @customer_ns.response(404, 'Customer Not Found')
     @customer_ns.response(204, 'Customer deleted')
     def delete(self, customer_id):
         """Delete one Customer"""
-        cid = get_jwt_claims()['customer_id']
-        query = {'id': customer_id}
-        if ((cid) and (cid != customer_id)):
-            query.update({'id': False})
-
-        result = CustomerModel.query.filter_by(**query).first_or_404()
-        db.session.delete(result)
-        db.session.commit()
-        return result, 200
+        validation = self.validate(CustomerModel, roles=['admin', 'reseller'])
+        return self.delete_one(CustomerModel, customer_id, validation)
     
 
     @customer_ns.expect(CustomerModel.register_model)  
     @customer_ns.marshal_with(CustomerModel.resource_model)
     def put(self, customer_id):
         """Edit Customer""" 
+        validation = self.validate(CustomerModel, roles=['admin', 'reseller'])
         data = api.payload
+        
         data.pop('users', None) # TODO: update users instead ignore
         data.pop('contexts', None) # TODO: update contexts instead ignore
-        cid = get_jwt_claims()['customer_id']
-        query = {'id': customer_id}
-        if ((cid) and (cid != customer_id)):
-            query.update({'id': False})
 
-        result = CustomerModel.query.filter_by(**query)
-        result.update(data)
-        db.session.commit()
-        result = result.first()
-        return result, 200
+        return self.update_one(CustomerModel, customer_id, data, validation)

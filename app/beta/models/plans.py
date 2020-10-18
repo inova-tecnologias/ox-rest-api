@@ -10,23 +10,28 @@ class Plan(db.Model):
     name = db.Column(db.String(50), unique=True)
     created = db.Column(db.DateTime, default=datetime.utcnow)
     changed = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    oxid = db.Column(db.String(50))
     description = db.Column(db.String(50))
+    
+    #OX Requirements
+    ma = db.Column(db.String(50))
+    config = db.Column(db.String(300))
     quota = db.Column(db.Integer)
 
 
     # Models
     register_model = api.model('Register Plan', {
     'name': fields.String(required=True),
-    'oxid': fields.String(required=True),
+    'ma': fields.String(required=True),
     'quota': fields.Integer(required=True),
+    'config': fields.String(),
     'description': fields.String()
     })
     
     resource_model = api.model('Plan', {
     'id': fields.Integer(),
     'name': fields.String(),
-    'oxid': fields.String(),
+    'ma': fields.String(),
     'quota': fields.Integer(),
+    'config': fields.String(),
     'description': fields.String(),
     })  

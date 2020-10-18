@@ -25,8 +25,8 @@ from .resources.auth import auth_ns
 from .resources.users import user_ns
 from .resources.resellers import reseller_ns
 from .resources.customers import customer_ns
-from .resources.contexts import ctx_ns, theme_ns
-from .resources.mailboxes import mbx_ns
+from .resources.contexts import context_ns, theme_ns
+from .resources.mailboxes import mailbox_ns
 from .resources.plans import plan_ns
 
 
@@ -35,8 +35,8 @@ api.add_namespace(auth_ns)
 api.add_namespace(user_ns)
 api.add_namespace(reseller_ns)
 api.add_namespace(customer_ns)
-api.add_namespace(ctx_ns)
-api.add_namespace(mbx_ns)
+api.add_namespace(context_ns)
+api.add_namespace(mailbox_ns)
 api.add_namespace(plan_ns)
 api.add_namespace(theme_ns)
 

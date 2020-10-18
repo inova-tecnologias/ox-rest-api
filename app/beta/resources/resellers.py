@@ -23,21 +23,18 @@ class ResellerList(BaseResource):
     })
     def get(self):
         """Get the list of Resellers"""
-        claims = get_jwt_claims()
-        reseller_id = claims['reseller_id']
-        validation = {'id': reseller_id} if reseller_id else {}  
-        result = self.paginate(ResellerModel, validation=validation)
-        return result.items, {'X-Total-Count': result.total}
+        validation = self.validate(ResellerModel, roles=['admin'])
+        return self.get_many(ResellerModel, validation=validation)
 
     @reseller_ns.expect(ResellerModel.register_model, validate=True)
     @reseller_ns.marshal_with(ResellerModel.resource_model)
     def post(self):
         """Insert a Reseller"""
-        data = api.payload        
-        reseller = self.make_instance(ResellerModel, data)
-        db.session.add(reseller)
-        db.session.commit()
-        return reseller
+        validation = self.validate(ResellerModel, roles=['admin'])
+        data = api.payload   
+        data.update(validation)
+             
+        return self.insert_one(ResellerModel, data)
 
 
 @reseller_ns.route('/<int:reseller_id>')
@@ -46,44 +43,28 @@ class Reseller(BaseResource):
     @reseller_ns.marshal_with(ResellerModel.resource_model)
     def get(self, reseller_id):
         """Get one Reseller"""
-        cid = get_jwt_claims()['reseller_id']
-        query = {'id': reseller_id}
-        if ((cid) and (cid != reseller_id)):
-            query.update({'id': False})
-
-        result = ResellerModel.query.filter_by(**query).first_or_404()
-        return result
+        validation = self.validate(ResellerModel, roles=['admin'])
+        return self.get_one(ResellerModel, reseller_id, validation)
 
 
+    @reseller_ns.marshal_with(ResellerModel.resource_model)
     @reseller_ns.response(404, 'Reseller Not Found')
     @reseller_ns.response(204, 'Reseller deleted')
     def delete(self, reseller_id):
         """Delete one Reseller"""
-        cid = get_jwt_claims()['reseller_id']
-        query = {'id': reseller_id}
-        if ((cid) and (cid != reseller_id)):
-            query.update({'id': False})
-
-        result = ResellerModel.query.filter_by(**query).first_or_404()
-        db.session.delete(result)
-        db.session.commit()
-        return result, 200
+        validation = self.validate(ResellerModel, roles=['admin'])
+        return self.delete_one(ResellerModel, reseller_id, validation)
     
 
     @reseller_ns.expect(ResellerModel.register_model)  
     @reseller_ns.marshal_with(ResellerModel.resource_model)
     def put(self, reseller_id):
         """Edit Reseller""" 
+        validation = self.validate(ResellerModel, roles=['admin'])
         data = api.payload
+        
+        data.pop('customers', None) # TODO: update customers instead ignore
         data.pop('users', None) # TODO: update users instead ignore
         data.pop('contexts', None) # TODO: update contexts instead ignore
-        cid = get_jwt_claims()['reseller_id']
-        query = {'id': reseller_id}
-        if ((cid) and (cid != reseller_id)):
-            query.update({'id': False})
 
-        result = ResellerModel.query.filter_by(**query)
-        result.update(data)
-        db.session.commit()
-        result = result.first()
-        return result, 200
+        return self.update_one(ResellerModel, reseller_id, data, validation)

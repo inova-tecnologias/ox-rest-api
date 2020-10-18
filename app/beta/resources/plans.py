@@ -16,19 +16,20 @@ class PlanList(BaseResource):
     @plan_ns.marshal_with(PlanModel.resource_model)
     def get(self):
         """Get the list of Plans"""
-        result = self.paginate(PlanModel)
-        return result.items, {'X-Total-Count': result.total}
+        return self.get_many(PlanModel)
+
 
 
     @plan_ns.marshal_with(PlanModel.resource_model)
     @plan_ns.expect(PlanModel.register_model, validate=True)
     def post(self):
         """Insert a Plan"""
-        data = api.payload
-        instance = self.make_instance(PlanModel, data)
-        db.session.add(instance)
-        db.session.commit()
-        return instance, 201
+        validation = self.validate(PlanModel, roles=['admin'])
+        data = api.payload   
+        data.update(validation)
+             
+        return self.insert_one(PlanModel, data)
+
 
 
 @plan_ns.route('/<plan_id>')
@@ -37,27 +38,22 @@ class Plan(BaseResource):
     @plan_ns.marshal_with(PlanModel.resource_model)
     def get(self, plan_id):
         """Get one Plan"""
-        result = PlanModel.query.filter_by(id=plan_id).first_or_404
-        return result, 200
+        return self.get_one(PlanModel, plan_id)
+
 
 
     @plan_ns.marshal_with(PlanModel.resource_model)
     @plan_ns.response(404, 'Plan Not Found')
     @plan_ns.response(204, 'Plan deleted')
-    def delete(self, context_id):
+    def delete(self, plan_id):
         """Delete Plan"""
-        result = PlanModel.query.filter_by(id=plan_id).first_or_404()
-        db.session.delete(result)
-        db.session.commit()
-        return result, 204
+        validation = self.validate(PlanModel, roles=['admin'])
+        return self.delete_one(PlanModel, plan_id, validation)
         
     @plan_ns.expect(PlanModel.register_model)  
     @plan_ns.marshal_with(PlanModel.resource_model)
     def put(self, plan_id):
         """Edit Plan""" 
+        validation = self.validate(PlanModel, roles=['admin'])
         data = api.payload
-        result = PlanModel.query.filter_by(id=plan_id)
-        result.update(data)
-        db.session.commit()
-        result = result.first()
-        return result, 200
+        return self.update_one(PlanModel, plan_id, data, validation)

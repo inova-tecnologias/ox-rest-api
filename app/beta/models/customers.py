@@ -4,8 +4,9 @@ from app import db
 from .. import api
 from ..models.users import User
 from datetime import datetime
+from ..models.contexts import Context
 
-
+context_model = Context.resource_model
 user_model = User.resource_model
 
 class Customer(db.Model):
@@ -34,4 +35,5 @@ class Customer(db.Model):
     'description': fields.String(),
     'reseller_id': fields.Integer(),
     'users': fields.Nested(user_model),
+    'contexts': fields.Nested(context_model),
     }) 

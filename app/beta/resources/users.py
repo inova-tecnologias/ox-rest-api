@@ -31,27 +31,19 @@ class UserList(BaseResource):
             })
     def get(self):
         """Get the list of users"""
-        claims = get_jwt_claims()
-        customer_id = claims['customer_id']
-        reseller_id = claims['reseller_id']
-        validation = {'customer_id': customer_id} if customer_id else {}
-        if reseller_id:
-            validation.update({'reseller_id': reseller_id})
-        result = self.paginate(UserModel, validation=validation)
-        return result.items, {'X-Total-Count': result.total}
-
+        validation = self.validate(UserModel)
+        return self.get_many(UserModel, validation=validation)
         
 
     @user_ns.marshal_with(UserModel.resource_model)
     @user_ns.expect(UserModel.register_model, validate=True)
-    @user_ns.response(400, 'username or password incorrect')
     def post(self):
         """ Create User """
-        data = api.payload        
-        user = self.make_instance(UserModel, data)
-        db.session.add(user)
-        db.session.commit()
-        return user, 201
+        validation = self.validate(UserModel)
+        data = api.payload   
+        data.update(validation)
+             
+        return self.insert_one(UserModel, data)
 '''
         username = data['username']
         password = data['password']
@@ -76,14 +68,8 @@ class User(BaseResource):
     @user_ns.marshal_with(UserModel.resource_model)
     def get(self, user_id):
         """Get one User"""
-        cid = get_jwt_claims()['customer_id']
-        query = {'id': user_id}
-        if cid:
-            query.update({'customer_id': cid})
-
-        result = UserModel.query.filter_by(**query).first_or_404
-
-        return result
+        validation = self.validate(UserModel)
+        return self.get_one(UserModel, user_id, validation)
 
 
     @user_ns.response(404, 'User Not Found')
@@ -91,29 +77,14 @@ class User(BaseResource):
     @user_ns.marshal_with(UserModel.resource_model)
     def delete(self, user_id):
         """Delete one User"""
-        cid = get_jwt_claims()['customer_id']
-        query = {'id': user_id}
-        if cid:
-            query.update({'customer_id': cid})
-
-        result = UserModel.query.filter_by(**query).first_or_404()
-        db.session.delete(result)
-        db.session.commit()
-        return result, 200
+        validation = self.validate(UserModel)
+        return self.delete_one(UserModel, user_id, validation)
 
 
     @user_ns.expect(UserModel.register_model)  
     @user_ns.marshal_with(UserModel.resource_model)
     def put(self, user_id):
         """Edit User""" 
+        validation = self.validate(UserModel)
         data = api.payload
-        cid = get_jwt_claims()['customer_id']
-        query = {'id': user_id}
-        if cid:
-            query.update({'customer_id': cid})
-
-        result = UserModel.query.filter_by(**query)
-        result.update(data)
-        db.session.commit()
-        result = result.first()
-        return result, 200
+        return self.update_one(UserModel, user_id, data, validation)

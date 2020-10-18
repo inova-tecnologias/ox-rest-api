@@ -40,7 +40,7 @@ class Mailbox(db.Model):
     'given_name': fields.String(required=True),
     'last_name': fields.String(required=True),
     'display_name': fields.String(required=True),
-    'context_id': fields.Integer(required=True)
+    'context_id': fields.Integer(required=True),
     'customer_id': fields.Integer(),
     'reseller_id': fields.Integer(),
     })
