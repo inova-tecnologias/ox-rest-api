@@ -40,3 +40,20 @@ api.add_namespace(mbx_ns)
 api.add_namespace(plan_ns)
 api.add_namespace(theme_ns)
 
+#Handling errors
+from zeep.exceptions import Fault, Error
+@api.errorhandler(Fault)
+def handle_zeep_fault(error):
+    '''This is a custom error'''
+    return {'message': error.message}, 400
+
+@api.errorhandler(Error)
+def handle_zeep_error(error):
+    '''This is a custom error'''
+    return {'message': error.message}, 400
+
+from jwt.exceptions import ExpiredSignatureError
+@api.errorhandler(ExpiredSignatureError)
+def handle_jwt_expired(error):
+    '''This is a custom error'''
+    return {'message': error.message}, 401
