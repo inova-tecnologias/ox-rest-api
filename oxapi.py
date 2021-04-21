@@ -5,7 +5,6 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Command, prompt_bool
 
 
-
 app = create_app()
 manager = Manager(app)
 migrate = Migrate(app, db)
@@ -30,6 +29,12 @@ def destroy():
         ):
         db.drop_all()
         
+@MigrateCommand.command
+def oxcli():
+    """OXCLOUD Command Line Interface"""
+    print('Loading OX Environment')
+    from app.util.shell import MyPrompt
+    MyPrompt().cmdloop()
 
 if __name__ == '__main__':
     manager.run()
