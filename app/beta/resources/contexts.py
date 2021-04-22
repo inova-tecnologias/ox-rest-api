@@ -3,14 +3,16 @@ from flask_jwt_extended import get_jwt_claims
 
 from app import db
 from app.util import random_password
+from app.config import app_config
 from .base import BaseResource
 from .. import api
 from ..models.contexts import Context as CtxModel
-from ..soap.ox import (
-    oxaasadmctx, 
-    credentials as oxcreds,
-    Context as OXCtx
-)
+if app_config.USE_OX:
+    from ..soap.ox import (
+        oxaasadmctx, 
+        credentials as oxcreds,
+        Context as OXCtx
+    )
 
 ctx_ns = Namespace('Contexts', path='/contexts')
 theme_ns = Namespace('Theme', path='/theme')
@@ -41,24 +43,25 @@ class CtxList(BaseResource):
         password = random_password()
         sur_name = "Context Admin"
 
-        ctxname = (oxaasadmctx, name)
-        mail = "oxadmin@%s-%s" %ctxname
-        print(mail)
-        admin_user = {
-            'name': "oxadmin_%s_%s" %ctxname,
-            'password': password,
-            'display_name': "%s %s" %(name, sur_name),
-            'given_name': name,
-            'sur_name': sur_name,
-            'primaryEmail': mail,
-            'email1': mail
-        }
-        ctx = {
-            'maxQuota': 500,
-            'name': "%s_%s" %ctxname
-        } 
-        ctxid = OXCtx.service.create(auth=oxcreds, ctx=ctx, admin_user=admin_user)['id']
-        data.update({'ox_id': ctxid})
+        if app_config.USE_OX: 
+            ctxname = (oxaasadmctx, name)
+            mail = "oxadmin@%s-%s" %ctxname
+            admin_user = {
+                'name': "oxadmin_%s_%s" %ctxname,
+                'password': password,
+                'display_name': "%s %s" %(name, sur_name),
+                'given_name': name,
+                'sur_name': sur_name,
+                'primaryEmail': mail,
+                'email1': mail
+            }
+            ctx = {
+                'maxQuota': 500,
+                'name': "%s_%s" %ctxname
+            }
+            ctxid = OXCtx.service.create(auth=oxcreds, ctx=ctx, admin_user=admin_user)['id']
+            data.update({'ox_id': ctxid})
+        
         instance = self.make_instance(CtxModel, data)
         db.session.add(instance)
         db.session.commit()
@@ -96,7 +99,9 @@ class Ctx(BaseResource):
         result = CtxModel.query.filter_by(**query).first_or_404()
         db.session.delete(result)
         db.session.commit()
-        OXCtx.service.delete(auth=oxcreds, ctx={'id': ctx_id})
+        if app_config.USE_OX:
+            OXCtx.service.delete(auth=oxcreds, ctx={'id': ctx_id})
+    
         return result, 
         
     @ctx_ns.expect(CtxModel.register_model)  
@@ -145,7 +150,8 @@ class Theme(BaseResource):
                 }
             }
         }
-        OXCtx.service.change(auth=oxcreds, ctx=context)
+        if app_config.USE_OX:
+            OXCtx.service.change(auth=oxcreds, ctx=context)
 
 
 @theme_ns.route('/')
@@ -173,4 +179,5 @@ class ExtTheme(BaseResource):
                 }
             }
         }
-        OXCtx.service.change(auth=oxcreds, ctx=context)
+        if app_config.USE_OX:
+           OXCtx.service.change(auth=oxcreds, ctx=context)

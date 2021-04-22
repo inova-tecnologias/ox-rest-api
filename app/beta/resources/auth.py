@@ -26,7 +26,6 @@ def admin():
     for attr in [
         'username',
         'password',
-        'isAdmin',
         'reseller_id',
         'customer_id'
     ]:
@@ -35,7 +34,6 @@ def admin():
     user.username = input('Username: ')
     from getpass import getpass
     user.password = getpass()
-    user.isAdmin = True
 
     for attr in model.keys():
         setattr(user, attr, input(attr.capitalize() + ": "))

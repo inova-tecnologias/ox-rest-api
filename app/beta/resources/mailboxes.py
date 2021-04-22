@@ -1,16 +1,18 @@
 from flask_restplus import Resource, Namespace, fields
 from flask_jwt_extended import get_jwt_claims
 from app import db
+from app.config import app_config
 from .base import BaseResource
 from .. import api
 from ..models.mailboxes import Mailbox as MbxModel
 from ..models.plans import Plan as PlanModel
-from ..soap.ox import (
-    oxaasadmctx, 
-    credentials as oxcreds,
-    User as OXMbx,
-    OxaaSService as OXaaS
-)
+if app_config.USE_OX:
+    from ..soap.ox import (
+        oxaasadmctx, 
+        credentials as oxcreds,
+        User as OXMbx,
+        OxaaSService as OXaaS
+    )
 
 mbx_ns = Namespace('Mailboxes', path='/mailboxes')
 
@@ -74,19 +76,21 @@ class MbxList(BaseResource):
 
         mailbox.update(userAttributes)
         
-        mbxid = OXMbx.service.createByModuleAccessName(
-            auth=oxcreds,
-            usrdata=mailbox,
-            ctx={'id': data['ctx_id']},
-            access_combination_name=oxplan
-        )['id']
-
-        OXaaS.service.setMailQuota(
-            ctxid = data['ctx_id'],
-            usrid = mbxid,
-            quota = maxQuota,
-            creds = oxcreds
-        )
+        if app_config.USE_OX:
+            mbxid = OXMbx.service.createByModuleAccessName(
+                auth=oxcreds,
+                usrdata=mailbox,
+                ctx={'id': data['ctx_id']},
+                access_combination_name=oxplan
+            )['id']
+            OXaaS.service.setMailQuota(
+                ctxid = data['ctx_id'],
+                usrid = mbxid,
+                quota = maxQuota,
+                creds = oxcreds
+            )
+        else:
+            mbxid = -1
 
         data.update({'ox_id': mbxid, 'maxQuota': maxQuota})
         instance = self.make_instance(MbxModel, data)
@@ -127,11 +131,13 @@ class Mbx(BaseResource):
             condition = True
         
         result = MbxModel.query.filter(condition).filter_by(id=mbx_id).first_or_404()
-        OXMbx.service.delete(
-            auth=oxcreds,
-            ctx={'id': result.ctx_id},
-            user={'id': result.ox_id}
-            )        
+        if app_config.USE_OX:
+            OXMbx.service.delete(
+                auth=oxcreds,
+                ctx={'id': result.ctx_id},
+                user={'id': result.ox_id}
+                )        
+        
         db.session.delete(result)
         db.session.commit()
         return result
@@ -157,22 +163,23 @@ class Mbx(BaseResource):
             plan = PlanModel.query.filter_by(id=plan_id).first_or_404()
             maxQuota = plan.quota * 1024
             oxplan =  plan.oxid
-            OXMbx.service.changeByModuleAccessName(
-                auth=oxcreds,
-                user={
-                    'id': result.ox_id,
-                    'maxQuota': maxQuota
-                    },
-                ctx={'id': result.ctx_id},
-                access_combination_name=oxplan
-            )
+            if app_config.USE_OX:
+                OXMbx.service.changeByModuleAccessName(
+                    auth=oxcreds,
+                    user={
+                        'id': result.ox_id,
+                        'maxQuota': maxQuota
+                        },
+                    ctx={'id': result.ctx_id},
+                    access_combination_name=oxplan
+                )
 
-            OXaaS.service.setMailQuota(
-                ctxid = result.ctx_id,
-                usrid = result.ox_id,
-                quota = maxQuota,
-                creds = oxcreds
-            )
+                OXaaS.service.setMailQuota(
+                    ctxid = result.ctx_id,
+                    usrid = result.ox_id,
+                    quota = maxQuota,
+                    creds = oxcreds
+                )
             result.maxQuota=maxQuota
             result.plan_id=plan_id  
 
@@ -181,11 +188,12 @@ class Mbx(BaseResource):
         if data.get('enabled') != None:
             oxdata['mailenabled'] = oxdata.pop('enabled')
 
-        OXMbx.service.change(
-            auth=oxcreds,
-            usrdata=oxdata,
-            ctx={'id': result.ctx_id}
-        )
+        if app_config.USE_OX:
+            OXMbx.service.change(
+                auth=oxcreds,
+                usrdata=oxdata,
+                ctx={'id': result.ctx_id}
+            )
 
         db.session.commit()
         return result, 200
