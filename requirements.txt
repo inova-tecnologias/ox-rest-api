@@ -6,7 +6,7 @@ flask_restplus==0.13.0
 alembic==1.2.1
 Flask_Migrate==2.5.2
 python-dotenv==0.10.3
-flask_cors==3.0.8
+flask_cors==3.0.9
 flask_jwt_extended==3.25
 flask_script==2.0.6
 requests==2.24.0
